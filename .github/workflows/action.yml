@@ -13,14 +13,24 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Set up AWS credentials
+      run: aws configure set region ap-southeast-1 # Replace <YOUR_REGION> with your AWS region
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
     - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-      with:
-        region: ap-southeast-1 # Replace with your AWS region
-        registry: 784737056121.dkr.ecr.ap-southeast-1.amazonaws.com # Replace with you registry
-        access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: $(aws ecr get-login --no-include-email --region ap-southeast-1) # Replace <YOUR_REGION> with your AWS region
+
+
+    # - name: Login to Amazon ECR
+    #   id: login-ecr
+    #   uses: aws-actions/amazon-ecr-login@v1
+    #   with:
+    #     region: ap-southeast-1 # Replace with your AWS region
+    #     registry: 784737056121.dkr.ecr.ap-southeast-1.amazonaws.com # Replace with you registry
+    #     access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
     - name: Build Docker image
       run: docker build -t survey-frontend .
