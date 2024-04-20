@@ -1,0 +1,32 @@
+name: Docker Build and Push
+
+on:
+  push:
+    branches:
+    - main # Change this to your main branch name
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+      with:
+        region: ap-southeast-1 # Replace with your AWS region
+        registry: 784737056121.dkr.ecr.ap-southeast-1.amazonaws.com # Replace with you registry
+        access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: Build Docker image
+      run: docker build -t survey-frontend .
+
+    - name: Tag Docker image
+      run: docker tag survey-frontend ${{ steps.login-ecr.outputs.registry }}/survey-frontend:latest
+
+    - name: Push Docker image to Amazon ECR
+      run: docker push ${{ steps.login-ecr.outputs.registry }}/survey-frontend:latest
