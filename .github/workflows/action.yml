@@ -26,7 +26,7 @@ jobs:
       run: docker build -t survey-frontend .
 
     - name: Tag Docker image
-      run: docker tag survey-frontend ${{ steps.login-ecr.outputs.registry }}/survey-frontend:latest
+      run: docker tag survey-frontend:latest ${{ steps.login-ecr.outputs.registry }}/survey-frontend:latest
 
     - name: Push Docker image to Amazon ECR
       run: docker push ${{ steps.login-ecr.outputs.registry }}/survey-frontend:latest
