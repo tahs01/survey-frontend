@@ -5,6 +5,10 @@ on:
     branches:
     - main # Change this to your main branch name
 
+env:
+  AWS_DEFAULT_REGION: ap-southeast-1
+  REPOSITORY_URL: 784737056121.dkr.ecr.ap-southeast-1.amazonaws.com
+
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
@@ -17,10 +21,10 @@ jobs:
       run: |
         aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws configure set default.region ap-southeast-1
+        aws configure set default.region $AWS_DEFAULT_REGION
 
     - name: Login to Amazon ECR
-      run: aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 784737056121.dkr.ecr.ap-southeast-1.amazonaws.com # Replace <YOUR_REGION> with your AWS region
+      run: aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPOSITORY_URL # Replace <YOUR_REGION> with your AWS region
 
 
     # - name: Login to Amazon ECR
@@ -36,7 +40,7 @@ jobs:
       run: docker build -t survey-frontend .
 
     - name: Tag Docker image
-      run: docker tag survey-frontend:latest 784737056121.dkr.ecr.ap-southeast-1.amazonaws.com/survey-frontend:latest
+      run: docker tag survey-frontend:latest $REPOSITORY_URL/survey-frontend:latest
 
     - name: Push Docker image to Amazon ECR
-      run: docker push 784737056121.dkr.ecr.ap-southeast-1.amazonaws.com/survey-frontend:latest
+      run: docker push $REPOSITORY_URL/survey-frontend:latest
